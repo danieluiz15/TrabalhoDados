@@ -39,6 +39,8 @@ typedef struct Processo {
 } Processo;
 
 int contarProcessos(const char* filename);
+int buscarIdUltimoOJ(const char* filename, const char* id_processo);
+char* processoMaisAntigo(const char* filename);
 int converterDataParaDias(const Date* data);
 int calcularDiasEntreDatas(const char *filename, const char *id_processo);
 double calcularMeta1(const char *filename);

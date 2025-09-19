@@ -1,7 +1,11 @@
-#include "processo.h"
+    #include "processo.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+// -------------------------
+// Item 1 - Contar Processos
+// -------------------------
 
 int contarProcessos(const char* filename) { // Funcao 1 para contar processos
     FILE* fp = fopen(filename, "r");
@@ -24,6 +28,95 @@ int contarProcessos(const char* filename) { // Funcao 1 para contar processos
     fclose(fp);
     return contador;
 }
+
+
+// ---------------------------------------------
+// Item 2 - Buscar id_ultimo_oj pelo id_processo
+// ---------------------------------------------
+
+int buscarIdUltimoOJ(const char* filename, const char* id_processo) {
+    FILE* fp = fopen(filename, "r");
+    if (!fp) {
+        perror("Erro ao abrir o arquivo");
+        return -1;
+    }
+
+    char linha[4096];
+    fgets(linha, sizeof(linha), fp); // pula cabeçalho
+
+    while (fgets(linha, sizeof(linha), fp)) {
+        char copia[4096];
+        strcpy(copia, linha);
+
+        char *token = strtok(copia, ";"); // primeira coluna = id_processo
+        if (token != NULL && strcmp(token, id_processo) == 0) {
+            int coluna = 0;
+            while (token != NULL) {
+                if (coluna == 8) { // coluna 9 = id_ultimo_oj
+                    fclose(fp);
+                    return atoi(token);
+                }
+                token = strtok(NULL, ";");
+                coluna++;
+            }
+        }
+    }
+
+    fclose(fp);
+    return -1; // não encontrado
+}
+
+
+// ------------------------------------------------------
+// Item 3 - id_processo com a data de recebimento mais antiga
+// ------------------------------------------------------
+
+char* processoMaisAntigo(const char* filename) {
+    FILE* fp = fopen(filename, "r");
+    if (!fp) {
+        perror("Erro ao abrir o arquivo");
+        return NULL;
+    }
+
+    static char id_antigo[100];
+    char linha[4096];
+    fgets(linha, sizeof(linha), fp); // pula cabeçalho
+
+    int menorAno = 9999, menorMes = 12, menorDia = 31;
+
+    while (fgets(linha, sizeof(linha), fp)) {
+        char copia[4096];
+        strcpy(copia, linha);
+
+        char *token = strtok(copia, ";");
+        char id[100];
+        strcpy(id, token);
+
+        int coluna = 0;
+        int dia, mes, ano;
+
+        while (token != NULL) {
+            if (coluna == 9) { // coluna 10 = dt_recebimento
+                sscanf(token, "%d-%d-%d", &ano, &mes, &dia);
+
+                if (ano < menorAno ||
+                   (ano == menorAno && mes < menorMes) ||
+                   (ano == menorAno && mes == menorMes && dia < menorDia)) {
+                    menorAno = ano;
+                    menorMes = mes;
+                    menorDia = dia;
+                    strcpy(id_antigo, id);
+                }
+            }
+            token = strtok(NULL, ";");
+            coluna++;
+        }
+    }
+
+    fclose(fp);
+    return id_antigo;
+}
+
 
 int converterDataParaDias(const Date* data) { // Função auxiliar para converter data em dias (parte da 10 função)
     return data->ano * 365 + data->mes * 30 + data->dia;
