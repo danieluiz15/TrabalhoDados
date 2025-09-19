@@ -45,4 +45,7 @@ int converterDataParaDias(const Date* data);
 int calcularDiasEntreDatas(const char *filename, const char *id_processo);
 double calcularMeta1(const char *filename);
 
+int contarProcessosAmbientais(const char* filename);
+int contarProcessosQuilombolas(const char* filename);
+
 #endif
