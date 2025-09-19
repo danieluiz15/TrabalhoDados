@@ -117,6 +117,80 @@ char* processoMaisAntigo(const char* filename) {
     return id_antigo;
 }
 
+// Item 6 - Contar processos relacionados a causas ambientais
+
+int contarProcessosAmbientais(const char* filename) {
+    FILE* fp = fopen(filename, "r");
+    if (!fp) {
+        perror("Erro ao abrir o arquivo");
+        return -1;
+    }
+
+    char linha[4096];
+    fgets(linha, sizeof(linha), fp); 
+    
+    int contador_ambientais = 0;
+
+    while (fgets(linha, sizeof(linha), fp)) {
+        char copia[4096];
+        strcpy(copia, linha);
+
+        char *token = strtok(copia, ";");
+        int coluna = 0;
+
+        while (token != NULL) {
+            if (coluna == 13) { 
+                if (atoi(token) == 1) {
+                    contador_ambientais++;
+                }
+                break;
+            }
+            token = strtok(NULL, ";");
+            coluna++;
+        }
+    }
+
+    fclose(fp);
+    return contador_ambientais;
+}
+
+// Item 7 - Contar processos relacionados a causas de quilombolas
+
+int contarProcessosQuilombolas(const char* filename) {
+    FILE* fp = fopen(filename, "r");
+    if (!fp) {
+        perror("Erro ao abrir o arquivo");
+        return -1;
+    }
+
+    char linha[4096];
+    fgets(linha, sizeof(linha), fp); 
+    
+    int contador_quilombolas = 0;
+
+    while (fgets(linha, sizeof(linha), fp)) {
+        char copia[4096];
+        strcpy(copia, linha);
+
+        char *token = strtok(copia, ";");
+        int coluna = 0;
+
+        while (token != NULL) {
+            if (coluna == 14) { 
+                if (atoi(token) == 1) {
+                    contador_quilombolas++;
+                }
+                break;
+            }
+            token = strtok(NULL, ";");
+            coluna++;
+        }
+    }
+
+    fclose(fp);
+    return contador_quilombolas;
+}
+
 
 int converterDataParaDias(const Date* data) { // Função auxiliar para converter data em dias (parte da 10 função)
     return data->ano * 365 + data->mes * 30 + data->dia;

@@ -42,6 +42,25 @@ int main() {
         printf("3) Não foi possível encontrar o processo mais antigo.\n");
     }
 
+// ----------------------
+// Item 6 - Processos ambientais
+// ----------------------
+int ambientais = contarProcessosAmbientais(arquivoCsv);
+if (ambientais >= 0) {
+    printf("6) Processos relacionados a causas ambientais: %d\n", ambientais);
+} else {
+    printf("6) Não foi possível contar processos ambientais.\n");
+}
+
+// ----------------------
+// Item 7 - Processos quilombolas  
+// ----------------------
+int quilombolas = contarProcessosQuilombolas(arquivoCsv);
+if (quilombolas >= 0) {
+    printf("7) Processos relacionados a causas quilombolas: %d\n", quilombolas);
+} else {
+    printf("7) Não foi possível contar processos quilombolas.\n");
+}
 
     int dias = calcularDiasEntreDatas(arquivoCsv, idBuscado); // Funcao 10 (atualmente nao esta funcionando corretamente sem a funcao 2)
     if (dias >= 0) {
