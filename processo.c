@@ -1,4 +1,4 @@
-    #include "processo.h"
+#include "processo.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -191,6 +191,85 @@ int contarProcessosQuilombolas(const char* filename) {
     return contador_quilombolas;
 }
 
+// ========================================
+// NOVAS FUNÇÕES - Itens 8 e 9
+// ========================================
+
+// Item 8 - Contar processos relacionados a causas indígenas
+int contarProcessosIndigenas(const char* filename) {
+    FILE* fp = fopen(filename, "r");
+    if (!fp) {
+        perror("Erro ao abrir o arquivo");
+        return -1;
+    }
+
+    char linha[4096];
+    fgets(linha, sizeof(linha), fp); // Pula o cabeçalho
+    
+    int contador_indigenas = 0;
+
+    while (fgets(linha, sizeof(linha), fp)) {
+        char copia[4096];
+        strcpy(copia, linha);
+
+        char *token = strtok(copia, ";");
+        int coluna = 0;
+
+        while (token != NULL) {
+            if (coluna == 15) { // flag_indigenas está na coluna 15 (16ª coluna)
+                if (atoi(token) == 1) {
+                    contador_indigenas++;
+                }
+                break;
+            }
+            token = strtok(NULL, ";");
+            coluna++;
+        }
+    }
+
+    fclose(fp);
+    return contador_indigenas;
+}
+
+// Item 9 - Contar processos relacionados a infância e juventude
+int contarProcessosInfancia(const char* filename) {
+    FILE* fp = fopen(filename, "r");
+    if (!fp) {
+        perror("Erro ao abrir o arquivo");
+        return -1;
+    }
+
+    char linha[4096];
+    fgets(linha, sizeof(linha), fp); // Pula o cabeçalho
+    
+    int contador_infancia = 0;
+
+    while (fgets(linha, sizeof(linha), fp)) {
+        char copia[4096];
+        strcpy(copia, linha);
+
+        char *token = strtok(copia, ";");
+        int coluna = 0;
+
+        while (token != NULL) {
+            if (coluna == 16) { // flag_infancia está na coluna 16 (17ª coluna)
+                if (atoi(token) == 1) {
+                    contador_infancia++;
+                }
+                break;
+            }
+            token = strtok(NULL, ";");
+            coluna++;
+        }
+    }
+
+    fclose(fp);
+    return contador_infancia;
+}
+
+// ========================================
+// FUNÇÕES EXISTENTES (continuação)
+// ========================================
 
 int converterDataParaDias(const Date* data) { // Função auxiliar para converter data em dias (parte da 10 função)
     return data->ano * 365 + data->mes * 30 + data->dia;
@@ -305,5 +384,4 @@ double calcularMeta1(const char *filename) { // Funcao 11 para calcular a meta 1
     }
 
     return ((double)soma_julgado / divisor) * 100.0;
-   
 }
