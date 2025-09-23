@@ -1,4 +1,4 @@
-#include "processo.h"
+#include "processo.c"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,6 +30,23 @@ int main() {
     } else {
         printf("3) Não foi possível encontrar o processo mais antigo.\n");
     }
+
+    //Item 4 - Processos de violência doméstica
+    int violenciaDomestica = contarViolenciaDomestica(arquivoCsv);
+    if (violenciaDomestica >= 0) {
+        printf("4) Processos relacionados a violência doméstica: %d\n", violenciaDomestica);
+    } else {
+        printf("4) Não foi possível contar processos de violência doméstica.\n");
+    }
+
+    //Item 5 - Processos de feminicídio
+    int feminicidio = contarViolenciaDomestica(arquivoCsv); 
+    if (feminicidio >= 0) {
+        printf("5) Processos relacionados a feminicídio: %d\n", feminicidio);
+    } else {
+        printf("5) Não foi possível contar processos de feminicídio.\n");
+    }
+
 
     // Item 6 - Processos ambientais
     int ambientais = contarProcessosAmbientais(arquivoCsv);
@@ -66,7 +83,7 @@ int main() {
     // Item 10 - Dias entre datas
     int dias = calcularDiasEntreDatas(arquivoCsv, idBuscado);
     if (dias >= 0) {
-        printf("10) O processo %s levou %d dias entre recebimento e resolucao.\n", idBuscado, dias);
+        printf("10) O numero de dias entre recebimento e resolucao: %d\n", dias);
     } else {
         printf("10) Não foi possível calcular os dias entre as datas.\n");
     }
@@ -74,9 +91,19 @@ int main() {
     // Item 11 - Meta 1
     double percentual = calcularMeta1(arquivoCsv);
     if (percentual >= 0) {
-        printf("11) Percentual da Meta 1: %.2f%%\n", percentual);
+        printf("11) Percentual da Meta 1: %.2f\n", percentual);
     } else {
         printf("11) Não foi possível calcular o percentual da Meta 1.\n");
+    }
+
+    // Item 12 - Gerar CSV de processos julgados
+    const char* arquivoEntrada = arquivoCsv;
+    const char* arquivoSaida = "processos_julgados.csv";
+
+    if(gerarCSVjulgados(arquivoEntrada, arquivoSaida)) {
+        printf("12) Arquivo '%s' gerado com sucesso.\n", arquivoSaida);
+    } else {
+        printf("12) Falha ao gerar o arquivo.\n");
     }
 
     return 0;

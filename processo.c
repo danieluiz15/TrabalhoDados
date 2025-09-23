@@ -117,6 +117,77 @@ char* processoMaisAntigo(const char* filename) {
     return id_antigo;
 }
 
+//Item 4 - Contar processos relacionados a violência doméstica
+
+int contarViolenciaDomestica(const char* filename) {
+    FILE* fp = fopen(filename, "r");
+    if (!fp) {
+        perror("Erro ao abrir o arquivo");
+        return -1;
+    }
+    char linha[4096];
+    fgets(linha, sizeof(linha), fp); 
+
+    int violenciaDomestica = 0;
+
+    while (fgets(linha, sizeof(linha), fp)) {
+        char copia[4096];
+        strcpy(copia, linha);
+
+        char *token = strtok(copia, ";");
+        int coluna = 0;
+
+        while (token != NULL) {
+        if (coluna == 11) { 
+            if (atoi(token) == 1) {
+                violenciaDomestica++;
+            }
+            break; 
+        }
+        token = strtok(NULL, ";");
+        coluna++;
+        }
+    }
+    fclose(fp);
+    return violenciaDomestica;
+}
+
+// Item 5 - Contar processos relacionados a feminicídio
+
+int contarFeminicidio(const char* filename) {
+    FILE* fp = fopen(filename, "r");
+    if (!fp) {
+        perror("Erro ao abrir o arquivo");
+        return -1;
+    }
+
+    char linha[4096];
+    fgets(linha, sizeof(linha), fp); // pula o cabeçalho
+
+    int contador_feminicidio = 0;
+
+    while (fgets(linha, sizeof(linha), fp)) {
+        char copia[4096];
+        strcpy(copia, linha);
+
+        char *token = strtok(copia, ";");
+        int coluna = 0;
+
+        while (token != NULL) {
+        if (coluna == 12) { // flag_feminicidio
+            if (atoi(token) == 1) {
+                contador_feminicidio++;
+            }
+            break; 
+        }
+        token = strtok(NULL, ";");
+        coluna++;
+        }
+    }
+
+    fclose(fp);
+    return contador_feminicidio;
+}
 // Item 6 - Contar processos relacionados a causas ambientais
 
 int contarProcessosAmbientais(const char* filename) {
@@ -145,7 +216,7 @@ int contarProcessosAmbientais(const char* filename) {
                 }
                 break;
             }
-            token = strtok(NULL, ";");
+            token = strtok(NULL, ",");
             coluna++;
         }
     }
@@ -191,9 +262,6 @@ int contarProcessosQuilombolas(const char* filename) {
     return contador_quilombolas;
 }
 
-// ========================================
-// NOVAS FUNÇÕES - Itens 8 e 9
-// ========================================
 
 // Item 8 - Contar processos relacionados a causas indígenas
 int contarProcessosIndigenas(const char* filename) {
@@ -266,10 +334,7 @@ int contarProcessosInfancia(const char* filename) {
     fclose(fp);
     return contador_infancia;
 }
-
-// ========================================
-// FUNÇÕES EXISTENTES (continuação)
-// ========================================
+// Item 10 - Calcular dias entre dt_recebimento e dt_resolvido
 
 int converterDataParaDias(const Date* data) { // Função auxiliar para converter data em dias (parte da 10 função)
     return data->ano * 365 + data->mes * 30 + data->dia;
@@ -282,106 +347,129 @@ int calcularDiasEntreDatas(const char *filename, const char *id_processo) { // F
         return -1;
     }
 
-    char linha[2048]; // As linhas deverao ser ajustadas no final do codigo
-    fgets(linha, sizeof(linha), fp); // Lê o cabeçalho
+    char linha[4096];
+    fgets(linha, sizeof(linha), fp); // pula cabeçalho
 
-    while (fgets(linha, sizeof(linha), fp) != NULL) {
-        char *token;
-        char copiaLinha[2048];
-        strcpy(copiaLinha, linha);
+    while (fgets(linha, sizeof(linha), fp)) {
+        char copia[4096];
+        strcpy(copia, linha);
 
-        token = strtok(copiaLinha, ",");
-        if (token != NULL && strcmp(token, id_processo) == 0) {
-            int coluna = 0;
-            while (token != NULL && coluna < 9){
-                token = strtok(NULL, ",");
-                coluna++;
+        char *token = strtok(copia, ";");
+        int coluna = 0;
+        Date dt_recebimento, dt_resolvido;
+        int achar = 0;
+
+        if (token && strcmp(token, id_processo) == 0) achar = 1;
+
+        while (token != NULL) {
+            if (coluna == 9) {
+                sscanf(token, "%d-%d-%d", &dt_recebimento.ano, &dt_recebimento.mes, &dt_recebimento.dia);
             }
-            
-            char dt_recebimento[20] = "";
-            char dt_resolvido[20] = "";
-            
-            if (token != NULL) {
-                strcpy(dt_recebimento, token);
+            if (coluna == 18) {
+                sscanf(token, "%d-%d-%d", &dt_resolvido.ano, &dt_resolvido.mes, &dt_resolvido.dia);
             }
-
-            while (token != NULL && coluna < 18){
-                token = strtok(NULL, ",");
-                coluna++;
-            }
-
-            if (token != NULL) {
-                strcpy(dt_resolvido, token);
-            }
-
+            token = strtok(NULL, ";");
+            coluna++;
+        }
+        if (achar) {
             fclose(fp);
-
-            if (strlen(dt_recebimento) == 0 || strlen(dt_resolvido) == 0) {
-                return -1; // Datas inválidas
-            }
-
-            int dias1 = converterDataParaDias(dt_recebimento);
-            int dias2 = converterDataParaDias(dt_resolvido);
-
-            if(dias1 == -1 || dias2 == -1) {
-                return -1; // Erro na conversão das datas
-            }
-
+            int dias1 = converterDataParaDias(&dt_recebimento);
+            int dias2 = converterDataParaDias(&dt_resolvido);
             return dias2 - dias1;
         }
     }
+    fclose(fp);
+    return -1;
 }
 
 int stringParaInt(const char *texto) { // Função auxiliar para converter string para int
     if(texto == NULL || strlen(texto) == 0 || texto[0] == '\n') 
-        return 0; // Retorna 0 para strings nulas ou vazias
-    return atoi(texto);
+        return 0; 
+        return atoi(texto);
 }
 
-double calcularMeta1(const char *filename) { // Funcao 11 para calcular a meta 1
+// Funcao 11 para calcular a meta 1
+double calcularMeta1(const char *filename) { 
     FILE* fp = fopen(filename, "r");
-    if (fp == NULL) {
-        perror("Erro ao abrir o arquivo");
-        return -1.0;
-    }
+    if (fp == NULL) 
+    return -1.0;
 
     char linha[4096];
-    fgets(linha, sizeof(linha), fp); 
+    fgets(linha, sizeof(linha), fp);
+    int soma_cnm1 = 0, soma_julgado = 0, soma_desm1 = 0, soma_susm1 = 0;
 
-    int soma_cnm1 = 0;
-    int soma_julgado = 0;
-    int soma_desm1 = 0;
-    int soma_susm1 = 0;
+    while (fgets(linha, sizeof(linha), fp)) {
+        char copia[4096];
+        strcpy(copia, linha);
 
-    while (fgets(linha, sizeof(linha), fp) != NULL) {
-        char *token;
-        char copiaLinha[4096];
-        strcpy(copiaLinha, linha);
-
+        char *token = strtok(copia, ";");
         int coluna = 0;
-        token = strtok(copiaLinha, ",");
-
         while (token != NULL) {
-            if (coluna == 19) { // Coluna cnm1
-                soma_cnm1 += stringParaInt(token);
-            } else if (coluna == 24) { // Coluna julgadom1
-                soma_julgado += stringParaInt(token);
-            } else if (coluna == 26) { // Coluna desm1
-                soma_desm1 += stringParaInt(token);
-            } else if (coluna == 27) { // Coluna susm1
-                soma_susm1 += stringParaInt(token);
-            }
-            token = strtok(NULL, ",");
+            if (coluna == 19) soma_cnm1 += stringParaInt(token);
+            if (coluna == 24) soma_julgado += stringParaInt(token);
+            if (coluna == 26) soma_desm1 += stringParaInt(token);
+            if (coluna == 27) soma_susm1 += stringParaInt(token);
+            token = strtok(NULL, ";");
             coluna++;
         }
     }
-
     fclose(fp);
 
     int divisor = soma_cnm1 + soma_desm1 - soma_susm1;
-    if(divisor == 0) {
-        return -1.0; // Evita divisão por zero
+    if (divisor == 0) return -1.0;
+    return ((double)soma_julgado / divisor) * 100.0;
+}
+
+// Função 12 - Gerar CSV com processos julgados
+int gerarCSVjulgados(const char* inputFilename, const char* outputFilename) {
+    FILE* inputFile = fopen(inputFilename, "r");
+    if (inputFile == NULL) {
+        perror("Erro ao abrir o arquivo de entrada");
+        return -1;
     }
 
-    return ((double)soma_julgado / divisor) * 100.0;
+    FILE* outputFile = fopen(outputFilename, "w");
+    if (outputFile == NULL) {
+        perror("Erro ao abrir o arquivo de saída");
+        fclose(inputFile);
+        return -1;
+    }
+
+    char linha[8192];
+    if (fgets(linha, sizeof(linha), inputFile) != NULL) {
+        fprintf(outputFile, "%s", linha); 
+    }
+
+    while (fgets(linha, sizeof(linha), inputFile) != NULL) {
+        char copiaLinha[8192];
+        strcpy(copiaLinha, linha);
+
+        char *token;
+        int coluna = 0;
+        int julgadom1 = 0;
+
+            char *ptr = linha;
+            char campo[1024];
+            for (int i = 0; i < 28; i++) { // 28 colunas
+                char *sep = strchr(ptr, ';');
+                int len = sep ? sep - ptr : strlen(ptr);
+                strncpy(campo, ptr, len);
+                campo[len] = '\0';
+
+                if (i == 24) { // julgadom1
+                    julgadom1 = stringParaInt(campo);
+                }
+
+                if (sep) ptr = sep + 1;
+                else break;
+            }
+
+        if (julgadom1 == 1) { // Se o processo foi julgado
+            fprintf(outputFile, "%s", linha); // Escreve a linha no arquivo de saída
+        }
+    }
+
+    fclose(inputFile);
+    fclose(outputFile);
+    return 1; 
 }

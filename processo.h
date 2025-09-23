@@ -37,18 +37,18 @@ typedef struct Processo {
     int susm1;
 } Processo;
 
-// Funções já existentes
 int contarProcessos(const char* filename);
 int buscarIdUltimoOJ(const char* filename, const char* id_processo);
 char* processoMaisAntigo(const char* filename);
 int converterDataParaDias(const Date* data);
 int calcularDiasEntreDatas(const char *filename, const char *id_processo);
 double calcularMeta1(const char *filename);
+int contarViolenciaDomestica(const char* filename);
+int contarFeminicidio(const char* filename);
 int contarProcessosAmbientais(const char* filename);
 int contarProcessosQuilombolas(const char* filename);
-
-// NOVAS FUNÇÕES - Itens 8 e 9
 int contarProcessosIndigenas(const char* filename);
 int contarProcessosInfancia(const char* filename);
+int gerarCSVjulgados(const char* inputFilename, const char* outputFilename);
 
 #endif
