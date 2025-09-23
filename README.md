@@ -1,1 +1,5 @@
 # TrabalhoDados
+
+Documentação do projeto TP01 - Manipulando arquivos do DataJud
+
+O projeto tem como objetivo ler e processar os dados da base do CNJ (DataJud), a partir dos arquivos .csv que foram fornecidos. Com esses dados, o programa implementa uma série de funções para finalidades diferentes, como a quantidade de processos, filtros de acordo com o tipo de processo, calcúlos, e a exportação de dados. O código foi divido entre 3 arquivos principais, sendo eles: 1 - processo.h, que define os tipos de dados que irão ser utilizados no código, os protótipos das funções, e também serve como a ponte entre os outros arquivos; 2 - processo.c, que contém a implementação das funções que resolvem um dos itens do enunciado, e é onde estão as lógicas de leitura e processamento do arquivo; 3 - main.c, programa principal onde as funções são chamadas e executadas. Esse projeto mostra em prática como ler e interpretar arquivos .csv na linguagem C, utilizando TADs para organizar as informações.
